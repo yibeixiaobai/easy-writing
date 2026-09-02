@@ -114,6 +114,8 @@ Stack: Vue 3 + TypeScript + Vite + Pinia + Element Plus + TipTap 3 + Tauri 2.
 
 **How do I migrate to a new computer?** Export any book as JSON (worldbuilding included) and import it on the new machine, or copy the app data directory wholesale.
 
+**A local model (Ollama, LM Studio, etc.) fails with "no access permission" / 403?** Leave the API key empty. If you still get 403, the local server is most likely rejecting the request by its origin. Current desktop builds no longer send an origin with AI requests, so update first; on older builds, set `OLLAMA_ORIGINS=*` and restart Ollama, or add `http://tauri.localhost` and `tauri://localhost` to your server's allowed origins.
+
 ## Disclaimer
 
 The ranking-trend feature is for personal study and creative reference only. Crawling happens on your own device and network — respect the target sites' terms of service, keep request rates low, and do not build commercial data services on top of it. You are responsible for the copyright and compliance of AI-generated content.

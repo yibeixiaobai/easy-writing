@@ -23,7 +23,14 @@ type FetchLike = (input: string, init?: RequestInit) => Promise<Response>
 const resolveAiFetch = async (): Promise<FetchLike> => {
   if (isTauriRuntime()) {
     const { fetch: tauriFetch } = await import('@tauri-apps/plugin-http')
-    return tauriFetch as unknown as FetchLike
+    // 插件会给每个请求自动补 Origin 头（Windows 是 http://tauri.localhost），
+    // Ollama 等本地服务会按来源拒绝（403）。传空串 = 让插件摘掉这个头，
+    // 桌面端请求从此与 curl 一样不带来源。需 Cargo 给插件开 unsafe-headers 特性。
+    return (input, init) =>
+      tauriFetch(input, {
+        ...init,
+        headers: { Origin: '', ...(init?.headers as Record<string, string> | undefined) },
+      })
   }
   return window.fetch.bind(window)
 }
@@ -128,7 +135,7 @@ const readableHttpError = async (response: Response): Promise<string> => {
   const byStatus: Record<number, string> = {
     401: 'API Key 无效或未授权',
     402: '账户余额不足，请到供应商后台充值',
-    403: '没有访问权限（检查 Key 的可用范围）',
+    403: '没有访问权限：云端服务请检查 Key 的可用范围，本地服务请检查它的来源或 IP 访问限制',
     404: '接口路径或模型不存在（检查 BaseURL 与模型名）',
     429: '触发限流或额度不足',
   }

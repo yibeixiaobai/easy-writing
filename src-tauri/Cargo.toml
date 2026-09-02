@@ -1,6 +1,6 @@
 [package]
 name = "ew-client-desktop"
-version = "1.0.2"
+version = "1.0.3"
 description = "易创桌面客户端"
 authors = ["yilujian"]
 license = "AGPL-3.0-only"
@@ -19,7 +19,9 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
-tauri-plugin-http = "2"
+# unsafe-headers：允许前端把 Origin 传成空串，让插件摘掉自动补的 Origin 头。
+# 本地模型服务（Ollama 等）会按来源拒绝桌面端请求，见 utils/local-ai-client.ts 的 resolveAiFetch。
+tauri-plugin-http = { version = "2", features = ["unsafe-headers"] }
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 # 单实例锁：两个进程打开同一个 ew-writing.db 会在 Windows 上抢文件锁，
 # 表现为本地库时开时不开。第二个实例直接把已有窗口拉到前台。
